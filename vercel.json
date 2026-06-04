@@ -8,10 +8,7 @@
     ],
     "functions": {
         "api/index.js": {
-            "includeFiles": [
-                "static/**",
-                "swagger-output.json"
-            ]
+            "includeFiles": "{static/**,swagger-output.json}"
         }
     }
 }
