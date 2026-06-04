@@ -1,6 +1,6 @@
 import app from "../app.js";
 import config from "../src/config/config.js";
-import { connectMongo } from "../src/databases/mongo.cnx";
+import { connectMongo } from "../src/databases/mongo.cnx.js";
 
 let isConnected = false;
 
