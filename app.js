@@ -11,11 +11,10 @@ import { uploadRouter } from "./src/routes/upload.router.js";
 import { accessPreInfoRequest } from "./src/middlewares/preRequest.middleware.js";
 import { authMiddleware } from "./src/middlewares/auth.middleware.js";
 import swaggerUi from "swagger-ui-express";
-import path from "path";
-import fs from "fs";
+import { createRequire } from "module";
 
-const swaggerPath = path.join(process.cwd(), "swagger-output.json");
-const swaggerFile = JSON.parse(fs.readFileSync(swaggerPath, "utf-8"));
+const require = createRequire(import.meta.url);
+const swaggerFile = require("./swagger-output.json");
 
 const VERSION = "v1";
 const BASE_PATH = `/api/${VERSION}`;

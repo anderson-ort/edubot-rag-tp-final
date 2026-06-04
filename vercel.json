@@ -1,14 +1,13 @@
 {
     "version": 2,
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/api/index.js"
-        }
+    "routes": [
+        { "src": "^/$", "dest": "/static/index.html" },
+        { "src": "^/style\\.css$", "dest": "/static/style.css" },
+        { "src": "/(.*)", "dest": "/api/index.js" }
     ],
     "functions": {
         "api/index.js": {
-            "includeFiles": "{static/**,swagger-output.json}"
+            "includeFiles": "swagger-output.json"
         }
     }
 }
