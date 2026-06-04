@@ -1,50 +1,95 @@
+# EduBot RAG
 
-[Parcial demo](https://raw.githubusercontent.com/anderson-ort/tp_almagro_21_d/refs/heads/main/parciales/parcial_10_2025.md)
+EduBot RAG es un proyecto integrador que implementa una API backend con un flujo completo de **RAG (Retrieval-Augmented Generation)**. La aplicación procesa e indexa documentos (PDF/TXT), genera vectores semánticos (embeddings) usando modelos de **Google Gemini** y recupera el contexto relevante desde una base de datos vectorial en **Supabase** (pgvector) para responder preguntas con un asistente virtual impulsado por inteligencia artificial.
 
+## ✨ Características Principales
 
---- 
+- **Ingesta de Documentos**: Subida de archivos (Multer + PDF Parse), extracción de texto y segmentación (chunking).
+- **IA Generativa y Embeddings**: Integración nativa con la API de Google Gemini.
+- **Base de Datos Vectorial**: Uso de Supabase y `pgvector` para realizar búsquedas por similitud semántica.
+- **Historial de Chats**: Persistencia de las conversaciones configurable a través de archivos locales o base de datos remota con **MongoDB**.
+- **Autenticación y Seguridad**: Rutas protegidas mediante JSON Web Tokens (JWT).
+- **Documentación de la API**: Interfaz interactiva de Swagger disponible en la ruta `/docs`.
+- **Despliegue Serverless**: Optimizado para funcionar sobre Vercel sirviendo la web estática y la API simultáneamente.
 
-Challenge 
+---
 
-**Card: API básica con Healthcheck y persistencia en JSON**
+## 🛠 Requisitos Previos
 
-**Objetivo**
-Desarrollar un server API que exponga endpoints para verificación de estado y persistencia de datos en un archivo JSON externo.
+Antes de ejecutar este proyecto, necesitas contar con lo siguiente:
 
-**Requerimientos**
+- **Node.js** v18 o superior (el proyecto usa ES Modules nativos).
+- Una cuenta en **MongoDB Atlas** (o una base de datos local) para el historial de chats.
+- Un proyecto en **Supabase** configurado con pgvector (y credenciales correspondientes).
+- Una **API Key de Google Gemini** generada desde Google AI Studio.
 
-1. **Healthcheck**
+---
 
-   * Endpoint: `GET /health`
-   * Respuesta esperada: `200 OK` con un payload simple (ej: `{ status: "ok" }`)
+## 🚀 Instalación y Configuración Local
 
-2. **Persistencia en JSON**
+1. **Clonar el repositorio e ingresar a la carpeta del proyecto:**
+   ```bash
+   git clone <url-del-repositorio>
+   cd edubot-rag
+   ```
 
-   * Endpoint: `POST /data`
-   * Funcionalidad: recibir datos en el body y guardarlos en el archivo:
+2. **Instalar las dependencias:**
+   ```bash
+   npm install
+   ```
 
-     ```
-     https://raw.githubusercontent.com/Andru-1987/challenge-aero-terra/refs/heads/main/backend-aero-terra/data/barrios.json
-     ```
-   * Considerar validación básica del payload
+3. **Configurar las variables de entorno:**
+   Crea un archivo llamado `.env` en la raíz del proyecto. Puedes tomar como base el siguiente formato:
 
-3. **Lectura de datos**
+   ```env
+   # API Keys y Seguridad
+   GOOGLE_API_KEY=tu_api_key_de_gemini
+   JWT_TOKEN_SECRET=tu_secreto_para_jwt
 
-   * Endpoint: `GET /data`
-   * Funcionalidad: retornar todo el contenido actualizado del archivo JSON
+   # Modelos de Inteligencia Artificial (Ejemplos)
+   MODEL_LLM=gemini-1.5-pro
+   MODEL_EMBEDDING=text-embedding-004
+   MODEL_EMBEDDING_DIM=768
 
-**Criterios de aceptación**
+   # Configuración de almacenamiento de Chats (opciones: "mongo" o "file")
+   CHAT_STORAGE=mongo
+   MONGO_URI=mongodb+srv://usuario:password@cluster.mongodb.net/edubot
+   MONGODB_COLLECTION=chat_history
 
-* El endpoint `/health` responde correctamente
-* El endpoint `POST /data` persiste información sin romper la estructura del JSON
-* El endpoint `GET /data` devuelve los datos actualizados
-* Manejo básico de errores (ej: archivo no disponible, JSON inválido)
+   # Configuración de Archivos y Base Vectorial (Supabase)
+   ACCEPTED_FILE_TYPES=application/pdf,text/plain
+   SUPABASE_URL=https://tu_proyecto.supabase.co
+   SUPABASE_SERVICE_KEY=tu_service_key_de_supabase
+   SUPABASE_BUCKET_NAME=nombre_del_bucket
+   ```
 
+4. **Regenerar la documentación (Opcional):**
+   Si agregaste o modificaste algún endpoint, regenera el archivo `swagger-output.json` ejecutando:
+   ```bash
+   npm run swagger
+   ```
 
+---
 
+## 💻 Ejecución en Desarrollo Local
 
-TASK -> 
-   - Tener la posibilidad de tener algun historial de peticiones a GEMINI 
-   - Tener el store de cada chat con la respuesta a la API
-   
+Para levantar el servidor localmente, el proyecto cuenta con un script que carga automáticamente las variables desde `.env` usando banderas nativas de Node:
 
+```bash
+npm run dev
+```
+
+Una vez que el servidor esté en marcha, podrás:
+- **Ver la Landing Page**: Accediendo a la ruta raíz desde tu navegador (`http://localhost:<PUERTO>/`).
+- **Explorar la API y hacer peticiones**: Entrando a la ruta `http://localhost:<PUERTO>/docs` para visualizar el panel de Swagger UI.
+
+---
+
+## ☁️ Despliegue en Vercel
+
+La arquitectura del proyecto está pensada para ser completamente compatible con plataformas sin servidor (Serverless) como Vercel.
+
+### Pasos y advertencias de Despliegue:
+1. Asegúrate de configurar la variable de entorno `CHAT_STORAGE` siempre con el valor `mongo` en el panel de control de Vercel. Al desplegar una función Serverless, los archivos locales son de solo lectura y el uso de `CHAT_STORAGE=file` fallará en producción.
+2. Añade todas las demás variables de entorno desde la interfaz de Vercel antes del despliegue.
+3. El archivo `vercel.json` ya se encarga automáticamente de enrutar los assets estáticos a la CDN nativa y las peticiones a la API directamente al controlador de Express de forma eficiente.
